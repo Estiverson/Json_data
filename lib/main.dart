@@ -44,7 +44,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: new AppBar(
-          title: new Text('Contact List'),
+          title: new Text('Werkzeug Data'),
         ),
         body: new ListView.builder(
             itemCount: data == null ? 0 : data.length,
