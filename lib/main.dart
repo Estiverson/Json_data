@@ -50,8 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
             itemCount: data == null ? 0 : data.length,
             itemBuilder: (BuildContext context, int i) {
               return new ListTile(
-                title: new Text('Werkzeug 1 Temperatur beträgt: ''${data[i]["temp1"]}'
-                    'Und bei Werkzeug 2 sind es:  ''${data[i]["temp2"]}'),
+                title: new Text('Werkzeug 1 Temperatur beträgt: ''${data[i]["temp1"]}'),
               );
             }
         )
