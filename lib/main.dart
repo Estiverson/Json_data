@@ -23,8 +23,10 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String url = 'http://192.168.0.75/werkzeug/public/api/data_tool1';
+  String url = 'http://192.168.0.74/werkzeug/public/api/data_tool1';
   List data;
+  Timer timer;
+
   Future<String> makeRequest() async {
     var response = await http
         .get(Uri.encodeFull(url), headers: {"Accept": "application/json"});
@@ -37,20 +39,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    this.makeRequest();
+    super.initState();
+    timer = new Timer.periodic(new Duration(seconds: 2), (Timer timer) async {
+      this.makeRequest();
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    timer.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: new AppBar(
-          title: new Text('Werkzeug Data'),
+          title: new Text('Tool Data'),
         ),
         body: new ListView.builder(
             itemCount: data == null ? 0 : data.length,
             itemBuilder: (BuildContext context, int i) {
               return new ListTile(
-                title: new Text('Werkzeug 1 Temperatur beträgt: ''${data[i]["temp1"]}'),
+                title: new Text('Tool 1 Temperature is : ''${data[i]["temp1"]}' ' and tool 2 is: ''${data[i]["temp2"]}'),
               );
             }
         )
