@@ -23,7 +23,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String url = 'http://192.168.0.74/werkzeug/public/api/data_tool1';
+  String url = 'http://localhost/werkzeug/public/api/data_tool1';
   List data;
   Timer timer;
 
