@@ -1,0 +1,149 @@
+
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:charts_flutter/flutter.dart' as charts;
+
+Future<List<Photo>> fetchSeriesList(http.Client client) async {
+  final response =
+  await client.get('http://192.168.0.73/werkzeug/public/api/data_tool1');
+
+  // Use the compute function to run parsePhotos in a separate isolate
+  return compute(parseSeriesList, response.body);
+}
+
+// A function that will convert a response body into a List<Photo>
+List<Photo> parseSeriesList(String responseBody) {
+  final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
+
+  return parsed.map<Photo>((json) => Photo.fromJson(json)).toList();
+}
+
+class Photo {
+  final int temp1;
+  final int temp2;
+  final String wsp;
+
+
+  Photo({this.temp1, this.temp2, this.wsp});
+
+  factory Photo.fromJson(Map<String, dynamic> json) {
+    return Photo(
+      temp1: json['temp1'] as int,
+      temp2: json['temp2'] as int,
+
+    );
+  }
+}
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final appTitle = 'Isolate Demo';
+
+    return MaterialApp(
+      title: appTitle,
+      home: MyHomePage(title: appTitle),
+    );
+  }
+}
+
+class MyHomePage extends StatelessWidget {
+  final String title;
+
+  MyHomePage({Key key, this.title}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      body: FutureBuilder<List<Photo>>(
+        future: fetchSeriesList(http.Client()),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) print(snapshot.error);
+
+          return snapshot.hasData
+              ? SimpleSeriesLegend.withSampleData()
+              : Center(child: CircularProgressIndicator());
+        },
+      ),
+    );
+  }
+}
+
+class SimpleSeriesLegend extends StatelessWidget {
+  final List<charts.Series<Photo, String>> seriesList;
+  final bool animate;
+
+  SimpleSeriesLegend(this.seriesList, {this.animate});
+
+  factory SimpleSeriesLegend.withSampleData() {
+    return new SimpleSeriesLegend(
+      _createSampleData(),
+      // Disable animations for image tests.
+      animate: false,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new charts.BarChart(
+      seriesList,
+      animate: animate,
+      barGroupingType: charts.BarGroupingType.grouped,
+      // Add the series legend behavior to the chart to turn on series legends.
+      // By default the legend will display above the chart.
+      behaviors: [new charts.SeriesLegend()],
+    );
+  }
+
+  /// Create series list with multiple series
+
+ List<charts.Series<Photo, String>> _createSampleData() {
+    PageView.builder(
+        itemCount: seriesList.length,
+        itemBuilder: (context, index) {
+          final werkzeug1Wear = [
+            new Photo(wsp: 'WSP1', temp1:),
+            new Photo(wsp: 'WSP2', temp1: 36),
+            new Photo(wsp: 'WSP3', temp1: 44),
+            new Photo(wsp: 'WSP4', temp1: 36),
+          ];
+        }
+    );
+
+    return [
+
+      new charts.Series<Photo, String>(
+        id: 'WZG1',
+        domainFn: (Photo wearValue, _) => wearValue.wsp,
+        measureFn: (Photo wearValue, _) => wearValue.temp1,
+        data: werkzeug1Wear,
+      ),
+    ];
+  }
+}
+
+
+/*
+@override
+Widget build(BuildContext context) {
+  return GridView.builder(
+    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      crossAxisCount: 2,
+    ),
+    itemCount: photos.length,
+    itemBuilder: (context, index) {
+      return new Text('${photos[index].temp1}');
+    },
+  );
+} */
+
+
